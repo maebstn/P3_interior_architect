@@ -223,7 +223,7 @@ li:hover {
 	margin-bottom: 50px;
 }
 
-.filters .btn {
+.btn {
 	height: 37px;
 	width: auto;
 	background-color: transparent;
@@ -235,6 +235,10 @@ li:hover {
 	color: #1d6154;
 }
 
+.active {
+	background-color: #1d6154;
+	color: white;
+}
 .gallery {
 	width: 100%;
 	display: grid;

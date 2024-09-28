@@ -5,7 +5,6 @@ const apiUrl2 = 'http://localhost:5678/api/categories';
 // Utilisation de fetch pour faire une requête GET
 fetch(apiUrl)
 	.then((response) => {
-		console.log(response.ok);
 		if (!response.ok) {
 			throw new Error('Une erreur est survenue : ' + response.statusText);
 		}
