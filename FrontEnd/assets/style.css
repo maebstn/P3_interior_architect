@@ -239,6 +239,11 @@ li:hover {
 	background-color: #1d6154;
 	color: white;
 }
+
+.hide {
+	display: none; /* Cela cache les éléments avec cette classe */
+}
+
 .gallery {
 	width: 100%;
 	display: grid;
