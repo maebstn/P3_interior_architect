@@ -176,6 +176,11 @@ nav li {
 	font-size: 1.2em;
 }
 
+li:hover {
+	color: #b1663c;
+	cursor: pointer;
+}
+
 nav img {
 	width: 19px;
 }

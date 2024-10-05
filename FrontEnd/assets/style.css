@@ -186,6 +186,7 @@ nav img {
 
 li:hover {
 	color: #b1663c;
+	cursor: pointer;
 }
 #introduction {
 	display: flex;

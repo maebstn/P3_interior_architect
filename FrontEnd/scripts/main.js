@@ -100,3 +100,11 @@ fetch(apiUrl2)
 	.catch((error) => {
 		console.error('Erreur :', error); // Affiche une erreur dans la console en cas de problème
 	});
+
+// Attendre que le DOM soit chargé
+document.addEventListener('DOMContentLoaded', function () {
+	let identificationLogin = document.querySelector('#identification');
+	identificationLogin.addEventListener('click', function () {
+		window.location.href = 'login.html';
+	});
+});
