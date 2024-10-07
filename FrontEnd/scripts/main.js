@@ -103,7 +103,7 @@ fetch(apiUrl2)
 
 // Attendre que le DOM soit chargé
 document.addEventListener('DOMContentLoaded', function () {
-	let identificationLogin = document.querySelector('#identification');
+	let identificationLogin = document.querySelector('.identification');
 	identificationLogin.addEventListener('click', function () {
 		window.location.href = 'login.html';
 	});

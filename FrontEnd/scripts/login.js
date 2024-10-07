@@ -5,11 +5,14 @@ const bouton = document.querySelector('#submit');
 const email = document.querySelector('#email');
 const mdp = document.querySelector('#mdp');
 
+//Aucun message d'erreur n'est encore affiché
+let errorCheck = false;
+
 bouton.addEventListener('click', submitClick);
 
 function submitClick(event) {
 	event.preventDefault();
-	console.log(email.value);
+
 	fetch(apiUrl3, {
 		method: 'POST',
 		headers: {
@@ -39,17 +42,40 @@ function submitClick(event) {
 		})
 
 		.catch((e) => {
-			const errorMessage = document.createElement('p');
-			const divForm = document.querySelector('#login');
-			divForm.appendChild(errorMessage);
+			if (!errorCheck) {
+				errorCheck = true;
+				const errorMessage = document.createElement('p');
+				const divForm = document.querySelector('#login');
+				divForm.appendChild(errorMessage);
+				errorMessage.setAttribute('data-error', 'true');
 
-			errorMessage.innerText =
-				"L'identifiant et/ou le mot de passe est incorrect.";
-			errorMessage.style.color = 'red';
+				errorMessage.innerText =
+					"L'identifiant et/ou le mot de passe est incorrect.";
+				errorMessage.style.color = 'red';
 
-			email.style.border = '1px solid red';
-			mdp.style.border = '1px solid red';
+				email.style.border = '1px solid red';
+				mdp.style.border = '1px solid red';
+
+				email.addEventListener('click', removeErrorMessage);
+				mdp.addEventListener('click', removeErrorMessage);
+			} else {
+				return;
+			}
 		});
+}
+
+function removeErrorMessage() {
+	const existingErrorMessage = document.querySelector('[data-error="true"]');
+	if (existingErrorMessage) {
+		existingErrorMessage.remove(); // Supprime le message d'erreur
+		email.style.border = '1px solid #ccc'; // Réinitialise la bordure des champs
+		mdp.style.border = '1px solid #ccc';
+		errorCheck = false; // Réinitialise la variable d'erreur
+
+		//Supprimer l'écouteur une fois que l'erreur est supprimée
+		email.removeEventListener('click', removeErrorMessage);
+		mdp.removeEventListener('click', removeErrorMessage);
+	}
 }
 
 function count() {
