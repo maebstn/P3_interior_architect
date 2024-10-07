@@ -108,3 +108,30 @@ document.addEventListener('DOMContentLoaded', function () {
 		window.location.href = 'login.html';
 	});
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+	let identificationLogin = document.querySelector('.identification');
+	identificationLogin.addEventListener('click', function () {
+		window.location.href = 'login.html';
+	});
+});
+
+async function loginUserPage() {
+	const token = localStorage.getItem('token');
+	if (token) {
+		// Cache les boutons filtres
+		setTimeout(() => {
+			const buttons = document.querySelectorAll('.filters .btn');
+			buttons.forEach((button) => {
+				button.style.display = 'none'; // Cache les boutons
+			});
+		}, 500);
+
+		// Modification du texte du bouton de login à "logout"
+		let identificationLogin = document.querySelector('.identification');
+		identificationLogin.innerText = 'logout';
+	}
+}
+
+// Appelle la fonction après que la page est entièrement chargée
+document.addEventListener('DOMContentLoaded', loginUserPage);

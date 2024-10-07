@@ -236,6 +236,10 @@ li:hover {
 	color: #1d6154;
 }
 
+.newbtn {
+	color: black;
+}
+
 .active {
 	background-color: #1d6154;
 	color: white;
