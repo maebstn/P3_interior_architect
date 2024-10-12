@@ -101,37 +101,133 @@ fetch(apiUrl2)
 		console.error('Erreur :', error); // Affiche une erreur dans la console en cas de problème
 	});
 
-// Attendre que le DOM soit chargé
-document.addEventListener('DOMContentLoaded', function () {
-	let identificationLogin = document.querySelector('.identification');
-	identificationLogin.addEventListener('click', function () {
-		window.location.href = 'login.html';
-	});
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-	let identificationLogin = document.querySelector('.identification');
-	identificationLogin.addEventListener('click', function () {
-		window.location.href = 'login.html';
-	});
+let identificationLogin = document.querySelector('.identification');
+identificationLogin.addEventListener('click', function () {
+	window.location.href = 'login.html';
 });
 
 async function loginUserPage() {
 	const token = localStorage.getItem('token');
 	if (token) {
-		// Cache les boutons filtres
-		setTimeout(() => {
-			const buttons = document.querySelectorAll('.filters .btn');
-			buttons.forEach((button) => {
-				button.style.display = 'none'; // Cache les boutons
-			});
-		}, 500);
+		console.log(token);
+		const container = document.querySelector('.filters');
+		container.classList.add('hide');
+
+		//Modale
+		const modal = document.querySelector('.modal-overlay');
+		const closeBtn = document.querySelector('.close-modal-btn');
+
+		async function openModal() {
+			modal.classList.remove('hide');
+		}
+
+		async function closeModal(e, clickedOutside) {
+			if (clickedOutside) {
+				if (e.target.classList.contains('modal-overlay'))
+					modal.classList.add('hide');
+			} else modal.classList.add('hide');
+		}
+
+		// Création du bouton "Modifier"
+		const buttonModif = document.createElement('button');
+		buttonModif.setAttribute('id', 'newbtn');
+
+		// Création de l'icône
+		const iconeModifier = document.createElement('i');
+		iconeModifier.setAttribute('class', 'fa-regular fa-pen-to-square'); // Utilise FontAwesome ou une autre bibliothèque d'icônes
+
+		// Ajout de l'icône avant le texte
+		buttonModif.appendChild(iconeModifier); // Ajoute l'icône dans le bouton
+		buttonModif.append(' Modifier'); // Ajoute le texte après l'icône
+		buttonModif.classList.add('open-modal-btn');
+
+		// Création de la div pour le titre et le bouton
+		const titleButtonDiv = document.createElement('div');
+		titleButtonDiv.classList.add('title-button-container'); // Ajout d'une classe pour le style
+
+		// Ajout du titre et du bouton à la div
+		const title = document.querySelector('#portfolio h2');
+		titleButtonDiv.appendChild(title); // Ajoute le titre à la div
+		titleButtonDiv.appendChild(buttonModif); // Ajoute le bouton à la div
+
+		const portfolio = document.querySelector('#portfolio');
+		portfolio.insertBefore(titleButtonDiv, portfolio.firstChild);
 
 		// Modification du texte du bouton de login à "logout"
 		let identificationLogin = document.querySelector('.identification');
 		identificationLogin.innerText = 'logout';
+
+		//Lors du clic sur Logout
+		identificationLogin.addEventListener('click', function () {
+			// Supprimer le token du localStorage
+			localStorage.removeItem('token');
+			// Rediriger vers la page de connexion
+			window.location.href = 'login.html';
+		});
 	}
 }
 
-// Appelle la fonction après que la page est entièrement chargée
-document.addEventListener('DOMContentLoaded', loginUserPage);
+// Appelle la fonction immédiatement
+loginUserPage();
+
+//Modale
+const modal = document.querySelector('.modal-overlay');
+const closeBtn = document.querySelector('.close-modal-btn');
+const buttonModif = document.querySelector('.open-modal-btn');
+
+async function openModal() {
+	modal.classList.remove('hide');
+}
+
+async function closeModal(e, clickedOutside) {
+	if (clickedOutside) {
+		if (e.target.classList.contains('modal-overlay'))
+			modal.classList.add('hide');
+	} else modal.classList.add('hide');
+}
+
+buttonModif.addEventListener('click', openModal);
+modal.addEventListener('click', (e) => closeModal(e, true));
+closeBtn.addEventListener('click', closeModal);
+
+function modalGallery() {
+	fetch(apiUrl)
+		.then((response) => {
+			// Vérifie si la réponse de l'API est correcte
+			if (!response.ok) {
+				// Si la réponse est incorrecte, lance une erreur avec le message de statut
+				throw new Error('Une erreur est survenue : ' + response.statusText);
+			}
+			return response.json(); // Conversion de la réponse en format JSON
+		})
+		.then((data) => {
+			const gallery = document.querySelector('.modal-content'); // Sélection élément HTML pour la galerie
+			data.forEach((element) => {
+				// Pour chaque œuvre dans les données
+				// Création :
+				const figure = document.createElement('figure'); // Élément figure pour l'œuvre
+				const image = document.createElement('img'); // Élément pour l'image de l'œuvre
+
+				// Assigner les valeurs aux éléments créés
+				image.src = element.imageUrl; // Définit la source de l'image
+				image.alt = element.title; // Ajoute un attribut alt pour l'accessibilité
+
+				// Ajouter un attribut data-category à la figure
+				figure.dataset.category = element.categoryId; // Associe l'ID de la catégorie à l'élément figure
+
+				// Ajout des éléments à la figure
+				figure.append(image); // Ajoute l'image et le titre à la figure
+
+				// Ajout de la figure à la galerie
+				gallery.appendChild(figure); // Ajoute la figure à la galerie
+			});
+			const separator = document.createElement('hr');
+			const modalGallery = document.querySelector('.modal-wrapper');
+			modalGallery.appendChild(separator);
+		})
+		.catch((error) => {
+			console.error('Erreur :', error); // Affiche une erreur dans la console en cas de problème
+		});
+}
+
+modalGallery();
