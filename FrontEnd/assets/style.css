@@ -377,18 +377,48 @@ h3 {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
-	gap: 9px;
-	margin-right: 105px;
+	margin-right: 85px;
 	margin-left: 105px;
 	margin-top: 46px;
-	margin-bottom: 67px;
+	margin-bottom: 38px;
 }
 
 .modal-content img {
 	width: 76px;
+	height: 102px;
+	object-fit: cover;
 }
 
 hr {
 	border-top: 1px solid #b3b3b3; /* Couleur grise */
 	width: 420px;
+}
+
+/* Bouton Ajout photo, modale*/
+.modal-wrapper input {
+	font-family: 'Syne';
+	font-weight: 700;
+	font-size: 14px;
+	color: white;
+	background-color: #1d6154;
+	margin-top: 38px;
+	width: 237px;
+	text-align: center;
+	border-radius: 60px;
+	height: 36px;
+	display: block;
+	border: none;
+}
+
+.modal-content button {
+	transform: translate(-18px, -86px);
+	color: white;
+	background-color: black;
+	border: 1px;
+	font-size: 9px;
+	padding: 2px;
+}
+
+.modal-content figure {
+	margin-bottom: 29px;
 }

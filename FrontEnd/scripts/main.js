@@ -207,6 +207,8 @@ function modalGallery() {
 				// Création :
 				const figure = document.createElement('figure'); // Élément figure pour l'œuvre
 				const image = document.createElement('img'); // Élément pour l'image de l'œuvre
+				const deleteButton = document.createElement('button'); // Elément pour l'icône supprimer
+				const deleteIcon = document.createElement('i');
 
 				// Assigner les valeurs aux éléments créés
 				image.src = element.imageUrl; // Définit la source de l'image
@@ -215,15 +217,28 @@ function modalGallery() {
 				// Ajouter un attribut data-category à la figure
 				figure.dataset.category = element.categoryId; // Associe l'ID de la catégorie à l'élément figure
 
+				//Ajouter class à l'icône supprimer
+				deleteIcon.classList.add('fa-solid', 'fa-trash-can');
+				deleteButton.appendChild(deleteIcon);
+
 				// Ajout des éléments à la figure
-				figure.append(image); // Ajoute l'image et le titre à la figure
+				figure.appendChild(image); // Ajoute l'image et le titre à la figure
+				figure.appendChild(deleteButton);
 
 				// Ajout de la figure à la galerie
 				gallery.appendChild(figure); // Ajoute la figure à la galerie
+
+				deleteButton.addEventListener('click', closeModal);
 			});
+
 			const separator = document.createElement('hr');
 			const modalGallery = document.querySelector('.modal-wrapper');
 			modalGallery.appendChild(separator);
+
+			const submitButton = document.createElement('input');
+			submitButton.setAttribute('type', 'submit');
+			submitButton.setAttribute('value', 'Ajouter une photo');
+			modalGallery.appendChild(submitButton);
 		})
 		.catch((error) => {
 			console.error('Erreur :', error); // Affiche une erreur dans la console en cas de problème
