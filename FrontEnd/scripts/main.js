@@ -190,6 +190,28 @@ buttonModif.addEventListener('click', openModal);
 modal.addEventListener('click', (e) => closeModal(e, true));
 closeBtn.addEventListener('click', closeModal);
 
+async function reloadGallery() {
+	const gallery = document.querySelector('.modal-content');
+	gallery.innerHTML = ''; // Vider la galerie existante
+
+	// Répéter le fetch des données pour récupérer les œuvres mises à jour
+	fetch(apiUrl)
+		.then((response) => response.json())
+		.then((data) => {
+			data.forEach((element) => {
+				const figure = document.createElement('figure');
+				const image = document.createElement('img');
+				image.src = element.imageUrl;
+				image.alt = element.title;
+				figure.appendChild(image);
+				gallery.appendChild(figure);
+			});
+		})
+		.catch((error) =>
+			console.error('Erreur lors du rechargement de la galerie', error)
+		);
+}
+
 function modalGallery() {
 	fetch(apiUrl)
 		.then((response) => {
@@ -228,17 +250,50 @@ function modalGallery() {
 				// Ajout de la figure à la galerie
 				gallery.appendChild(figure); // Ajoute la figure à la galerie
 
-				deleteButton.addEventListener('click', closeModal);
+				deleteButton.addEventListener('click', function () {
+					const resourceId = element.id; // Remplace par l'ID ou la variable qui contient l'ID de la ressource
+					const apiUrl3 = `http://localhost:5678/api/works/${resourceId}`; // L'URL de l'API à modifier
+
+					fetch(apiUrl3, {
+						method: 'DELETE',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${localStorage.getItem('token')}`,
+						},
+					})
+						.then((response) => {
+							if (response.ok) {
+								console.log("Suppression de l'oeuvre avec succès");
+								reloadGallery();
+							} else {
+								response.json().then((data) => {
+									console.error('Erreur lors de la suppression:', data);
+								});
+							}
+						})
+						.catch((error) => console.error('Erreur réseau ou autre', error));
+				});
 			});
 
+			// Création et ajout de la ligne de séparation dans la modale
 			const separator = document.createElement('hr');
 			const modalGallery = document.querySelector('.modal-wrapper');
 			modalGallery.appendChild(separator);
 
+			// Création et ajout du bouton Ajout photo dans modale
 			const submitButton = document.createElement('input');
 			submitButton.setAttribute('type', 'submit');
 			submitButton.setAttribute('value', 'Ajouter une photo');
 			modalGallery.appendChild(submitButton);
+
+			//Quand click sur Ajout photo, ccaher et changer contenu modale
+			submitButton.addEventListener('click', function () {
+				gallery.style.visibility = 'hidden';
+				const modalTitle = document.querySelector('h3');
+				modalTitle.textContent = 'Ajouter une photo';
+				submitButton.setAttribute('value', 'Valider');
+				submitButton.style.background = '#A7A7A7';
+			});
 		})
 		.catch((error) => {
 			console.error('Erreur :', error); // Affiche une erreur dans la console en cas de problème

@@ -324,24 +324,25 @@ footer nav ul {
 	bottom: 0;
 	left: 0;
 	right: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .modal-wrapper {
 	width: 630px;
 	height: 688px;
 	background: white;
-	position: fixed;
-	top: 660px;
-	left: 405px;
 	border-radius: 10px;
-	transform: translate(32%, -80%);
+	display: flex;
+	flex-direction: column;
 }
 
 .open-modal-btn {
 	color: black;
 	background-color: transparent;
 	border: none;
-	font-size: 16px;
+	font-size: 14px;
 	margin-left: 31px;
 	margin-bottom: 47px;
 	grid-column: 3; /* Place le bouton dans la troisième colonne (à droite) */
@@ -377,7 +378,8 @@ h3 {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
-	margin-right: 85px;
+	gap: 8px;
+	margin-right: 96px;
 	margin-left: 105px;
 	margin-top: 46px;
 	margin-bottom: 38px;
@@ -392,6 +394,8 @@ h3 {
 hr {
 	border-top: 1px solid #b3b3b3; /* Couleur grise */
 	width: 420px;
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 /* Bouton Ajout photo, modale*/
@@ -401,7 +405,8 @@ hr {
 	font-size: 14px;
 	color: white;
 	background-color: #1d6154;
-	margin-top: 38px;
+	margin-top: 37px;
+	/* margin-bottom: 45px; */
 	width: 237px;
 	text-align: center;
 	border-radius: 60px;
@@ -410,13 +415,20 @@ hr {
 	border: none;
 }
 
+.modal-wrapper figure {
+	position: relative; /* Permet de positionner l'icône par rapport à l'image */
+}
+
 .modal-content button {
-	transform: translate(-18px, -86px);
 	color: white;
 	background-color: black;
 	border: 1px;
 	font-size: 9px;
 	padding: 2px;
+	position: absolute;
+	top: 5px; /* Ajuste selon ta préférence */
+	right: 5px; /* Positionne l'icône en haut à droite */
+	cursor: pointer;
 }
 
 .modal-content figure {
