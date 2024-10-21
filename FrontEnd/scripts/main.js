@@ -286,9 +286,15 @@ function modalGallery() {
 			submitButton.setAttribute('value', 'Ajouter une photo');
 			modalGallery.appendChild(submitButton);
 
-			//Quand click sur Ajout photo, ccaher et changer contenu modale
+			//Cacher seconde modale
+			gallery.style.display = 'flex';
+			const addPhotoModal = document.querySelector('.modal-add-photo');
+			addPhotoModal.style.display = 'none';
+
+			//Quand click sur Ajout photo, cacher et changer contenu modale
 			submitButton.addEventListener('click', function () {
-				gallery.style.visibility = 'hidden';
+				gallery.style.display = 'none';
+				addPhotoModal.style.display = 'flex';
 				const modalTitle = document.querySelector('h3');
 				modalTitle.textContent = 'Ajouter une photo';
 				submitButton.setAttribute('value', 'Valider');

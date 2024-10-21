@@ -434,3 +434,57 @@ hr {
 .modal-content figure {
 	margin-bottom: 29px;
 }
+
+/*Seconde modale*/
+
+.modal-add-photo {
+	justify-content: center;
+}
+
+.modal-add-photo form {
+	display: flex;
+	flex-direction: column;
+	width: 420px;
+}
+
+.modal-add-photo input {
+	width: 100%;
+	background-color: white;
+	box-shadow: 0px 4px 14px 0px #00000017;
+	border-radius: 0%;
+	height: 51px;
+	margin-bottom: 21px;
+	margin-top: 0px;
+	color: #444444;
+}
+
+.modal-add-photo select {
+	width: 100%;
+	background-color: white;
+	box-shadow: 0px 4px 14px 0px #00000017;
+	border-radius: 0%;
+	height: 51px;
+	border: 0px;
+	margin-bottom: 47px;
+}
+
+.modal-add-photo label {
+	margin-bottom: 10px;
+	font-size: 16px;
+}
+
+.modal-add-photo label:nth-of-type(1) {
+	margin-top: 30px;
+}
+
+.add-photo {
+	height: 169px;
+	background-color: #e8f1f6;
+	border-radius: 3px;
+	margin-top: 36px;
+}
+
+#photo-category {
+	font-size: 16px;
+	color: #444444;
+}
