@@ -13,6 +13,7 @@ fetch(apiUrl)
 		return response.json(); // Conversion de la réponse en format JSON
 	})
 	.then((data) => {
+		console.log(data);
 		const gallery = document.querySelector('.gallery'); // Sélection élément HTML pour la galerie
 		data.forEach((element) => {
 			// Pour chaque œuvre dans les données
@@ -239,7 +240,7 @@ function modalGallery() {
 				// Ajouter un attribut data-category à la figure
 				figure.dataset.category = element.categoryId; // Associe l'ID de la catégorie à l'élément figure
 
-				//Ajouter class à l'icône supprimer
+				//Ajouter class à l'icône supprimer et l'icône flèche
 				deleteIcon.classList.add('fa-solid', 'fa-trash-can');
 				deleteButton.appendChild(deleteIcon);
 
@@ -299,6 +300,148 @@ function modalGallery() {
 				modalTitle.textContent = 'Ajouter une photo';
 				submitButton.setAttribute('value', 'Valider');
 				submitButton.style.background = '#A7A7A7';
+
+				//Ajout icône flèche
+				const iconeArrow = document.createElement('i');
+				const buttonArrow = document.createElement('button');
+				iconeArrow.classList.add('fas', 'fa-arrow-left');
+				buttonArrow.appendChild(iconeArrow);
+				buttonArrow.classList.add('arrow-btn-wrapper');
+				const enteteIcon = document.querySelector('.close-btn-wrapper');
+				enteteIcon.appendChild(buttonArrow);
+
+				//Ajout du formulaire
+				// Création de l'élément <form>
+				const form = document.createElement('form');
+				form.setAttribute('action', '#');
+				form.setAttribute('method', 'post');
+
+				// Création du div pour ajouter une photo
+				const divAddPhoto = document.createElement('div');
+				divAddPhoto.classList.add('add-photo');
+
+				// Ajout de l'icône
+				const icon = document.createElement('i');
+				icon.classList.add('fa-regular', 'fa-image');
+
+				// Bouton pour ajouter une photo
+				const button = document.createElement('button');
+				button.classList.add('add-photo-btn');
+
+				// Input pour ajouter le fichier
+				const inputFile = document.createElement('input');
+				inputFile.setAttribute('type', 'file');
+				inputFile.setAttribute('accept', 'image/png, image/jpeg');
+
+				// Paragraphe pour le texte du bouton
+				const buttonText = document.createElement('p');
+				buttonText.textContent = '+ Ajouter photo';
+
+				// Ajout du texte sur le format de fichier accepté
+				const fileInfo = document.createElement('p');
+				fileInfo.textContent = 'jpg, png : 4mo max';
+
+				// Ajout d'un élément image pour l'aperçu
+				const imgPreview = document.createElement('img');
+				imgPreview.style.display = 'none'; // On cache l'image tant qu'aucune n'est sélectionnée
+				imgPreview.style.maxHeight = '169px'; // Limite de la taille de l'aperçu
+
+				// Gestion de l'affichage de l'image après sélection du fichier
+				inputFile.addEventListener('change', function (event) {
+					const file = event.target.files[0];
+
+					if (file) {
+						const reader = new FileReader();
+
+						reader.onload = function (e) {
+							imgPreview.setAttribute('src', e.target.result);
+							imgPreview.style.display = 'block'; // On affiche l'image une fois chargée
+						};
+
+						reader.readAsDataURL(file); // Lecture du fichier en tant qu'URL
+
+						//Masquer tout le contenu de l'encadré bleu
+						fileInfo.style.display = 'none';
+						buttonText.style.display = 'none';
+						icon.style.display = 'none';
+						button.style.display = 'none';
+					}
+				});
+
+				// Construction de l'élément bouton
+				button.appendChild(inputFile);
+				button.appendChild(buttonText);
+
+				// Ajout des éléments dans le div "add-photo"
+				divAddPhoto.appendChild(icon);
+				divAddPhoto.appendChild(button);
+				divAddPhoto.appendChild(fileInfo);
+				divAddPhoto.appendChild(imgPreview); // Ajouter l'image de prévisualisation après le bouton
+
+				// Création du label et input pour le titre
+				const labelTitle = document.createElement('label');
+				labelTitle.setAttribute('for', 'title-photo');
+				labelTitle.textContent = 'Titre';
+
+				const inputTitle = document.createElement('input');
+				inputTitle.setAttribute('type', 'text');
+				inputTitle.setAttribute('name', 'title');
+				inputTitle.setAttribute('id', 'title-photo');
+
+				// Création du label et du select pour la catégorie
+				const labelCategory = document.createElement('label');
+				labelCategory.setAttribute('for', 'photo-category');
+				labelCategory.textContent = 'Catégorie';
+
+				const selectCategory = document.createElement('select');
+				selectCategory.setAttribute('name', 'category');
+				selectCategory.setAttribute('id', 'photo-category');
+
+				// Ajout des éléments dans le formulaire
+				form.appendChild(divAddPhoto);
+				form.appendChild(labelTitle);
+				form.appendChild(inputTitle);
+				form.appendChild(labelCategory);
+				form.appendChild(selectCategory);
+
+				// Ajout du formulaire dans .modal-add-photo
+				addPhotoModal.appendChild(form);
+
+				// Quand click sur la catégorie
+				const categoryChoice = document.getElementById('photo-category');
+				const emptyOption = document.createElement('option');
+				emptyOption.textContent = '0';
+				emptyOption.style.opacity = '0';
+				categoryChoice.appendChild(emptyOption);
+				categoryChoice.innerHTML = ''; // Vider toutes les options avant de charger les nouvelles
+
+				fetch(apiUrl2)
+					.then((response) => {
+						// Vérifie si la réponse de l'API est correcte
+						if (!response.ok) {
+							throw new Error(
+								'Erreur dans la requête API : ' + response.statusText
+							);
+						}
+						return response.json(); // Conversion de la réponse en format JSON
+					})
+					.then((categories) => {
+						// Filtrer les catégories pour supprimer les doublons par ID
+						const uniqueCategories = categories.filter(
+							(category, index, self) =>
+								index === self.findIndex((cat) => cat.id === category.id)
+						);
+						// Pour chaque catégorie reçue, créer une option
+						uniqueCategories.forEach((category) => {
+							const optionCategory = document.createElement('option'); // Création d'une option pour chaque catégorie
+							optionCategory.textContent = category.name; // Utilise le nom de la catégorie comme texte
+							optionCategory.value = category.id; // Association de l'ID de la catégorie à l'option
+							categoryChoice.appendChild(optionCategory);
+						});
+					})
+					.catch((error) => {
+						console.error('Erreur :', error); // Affiche une erreur dans la console en cas de problème
+					});
 			});
 		})
 		.catch((error) => {
