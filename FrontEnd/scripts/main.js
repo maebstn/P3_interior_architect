@@ -171,90 +171,66 @@ async function loginUserPage() {
 // Appelle la fonction immédiatement
 loginUserPage();
 
-//Modale
+//modalGallery
+// Sélection des éléments modale, bouton de fermeture et bouton d'ouverture
 const modal = document.querySelector('.modal-overlay');
 const closeBtn = document.querySelector('.close-modal-btn');
 const buttonModif = document.querySelector('.open-modal-btn');
 
+// Fonction pour ouvrir la modale (retire la classe 'hide' pour la rendre visible)
 async function openModal() {
 	modal.classList.remove('hide');
 }
 
+// Fonction pour fermer la modale si clic en dehors modale
 async function closeModal(e, clickedOutside) {
 	if (clickedOutside) {
+		// Si le clic est en dehors de la modale (sur l'overlay), on la cache
 		if (e.target.classList.contains('modal-overlay'))
 			modal.classList.add('hide');
 	} else modal.classList.add('hide');
 }
 
+// Ouvre la modale au clic sur le bouton d'ouverture
 buttonModif.addEventListener('click', openModal);
+
+// Ferme la modale si l'utilisateur clique à l'extérieur
 modal.addEventListener('click', (e) => closeModal(e, true));
+
+// Ferme la modale en cliquant sur le bouton de fermeture
 closeBtn.addEventListener('click', closeModal);
 
-async function reloadGallery() {
+// Fonction pour recharger la galerie d'œuvres après une action
+async function reloadGallery(e) {
 	const gallery = document.querySelector('.modal-content');
 	gallery.innerHTML = ''; // Vider la galerie existante
 
-	// Répéter le fetch des données pour récupérer les œuvres mises à jour
+	// Fetch des œuvres pour mettre à jour la galerie
 	fetch(apiUrl)
 		.then((response) => response.json())
 		.then((data) => {
 			data.forEach((element) => {
+				// Création des éléments figure et image pour chaque œuvre
 				const figure = document.createElement('figure');
 				const image = document.createElement('img');
 				image.src = element.imageUrl;
 				image.alt = element.title;
 				figure.appendChild(image);
 				gallery.appendChild(figure);
-			});
-		})
-		.catch((error) =>
-			console.error('Erreur lors du rechargement de la galerie', error)
-		);
-}
 
-function modalGallery() {
-	fetch(apiUrl)
-		.then((response) => {
-			// Vérifie si la réponse de l'API est correcte
-			if (!response.ok) {
-				// Si la réponse est incorrecte, lance une erreur avec le message de statut
-				throw new Error('Une erreur est survenue : ' + response.statusText);
-			}
-			return response.json(); // Conversion de la réponse en format JSON
-		})
-		.then((data) => {
-			const gallery = document.querySelector('.modal-content'); // Sélection élément HTML pour la galerie
-			data.forEach((element) => {
-				// Pour chaque œuvre dans les données
-				// Création :
-				const figure = document.createElement('figure'); // Élément figure pour l'œuvre
-				const image = document.createElement('img'); // Élément pour l'image de l'œuvre
-				const deleteButton = document.createElement('button'); // Elément pour l'icône supprimer
+				// Création d'un bouton de suppression avec une icône de poubelle
+				const deleteButton = document.createElement('button');
 				const deleteIcon = document.createElement('i');
-
-				// Assigner les valeurs aux éléments créés
-				image.src = element.imageUrl; // Définit la source de l'image
-				image.alt = element.title; // Ajoute un attribut alt pour l'accessibilité
-
-				// Ajouter un attribut data-category à la figure
-				figure.dataset.category = element.categoryId; // Associe l'ID de la catégorie à l'élément figure
-
-				//Ajouter class à l'icône supprimer et l'icône flèche
 				deleteIcon.classList.add('fa-solid', 'fa-trash-can');
 				deleteButton.appendChild(deleteIcon);
-
-				// Ajout des éléments à la figure
-				figure.appendChild(image); // Ajoute l'image et le titre à la figure
 				figure.appendChild(deleteButton);
 
-				// Ajout de la figure à la galerie
-				gallery.appendChild(figure); // Ajoute la figure à la galerie
-
+				// Ajout d'un événement pour supprimer l'œuvre au clic
 				deleteButton.addEventListener('click', function () {
-					const resourceId = element.id; // Remplace par l'ID ou la variable qui contient l'ID de la ressource
-					const apiUrl3 = `http://localhost:5678/api/works/${resourceId}`; // L'URL de l'API à modifier
+					const resourceId = element.id; // Récupère l'ID de l'œuvre
+					const apiUrl3 = `http://localhost:5678/api/works/${resourceId}`;
 
+					// Suppression de l'œuvre via l'API
 					fetch(apiUrl3, {
 						method: 'DELETE',
 						headers: {
@@ -265,7 +241,69 @@ function modalGallery() {
 						.then((response) => {
 							if (response.ok) {
 								console.log("Suppression de l'oeuvre avec succès");
-								reloadGallery();
+								reloadGallery(); // Recharge la galerie après suppression
+							} else {
+								response.json().then((data) => {
+									console.error('Erreur lors de la suppression:', data);
+								});
+							}
+						})
+						.catch((error) => console.error('Erreur réseau ou autre', error));
+				});
+			});
+		})
+		.catch((error) =>
+			console.error('Erreur lors du rechargement de la galerie', error)
+		);
+}
+
+// Fonction pour initialiser et afficher la galerie dans la modale
+function modalGallery() {
+	// Fetch pour récupérer les œuvres à afficher
+	fetch(apiUrl)
+		.then((response) => {
+			if (!response.ok) {
+				throw new Error('Une erreur est survenue : ' + response.statusText);
+			}
+			return response.json();
+		})
+		.then((data) => {
+			// Sélectionne la galerie
+			const gallery = document.querySelector('.modal-content');
+			data.forEach((element) => {
+				// Création de la structure pour chaque œuvre (figure, image, bouton de suppression)
+				const figure = document.createElement('figure');
+				const image = document.createElement('img');
+				const deleteButton = document.createElement('button');
+				const deleteIcon = document.createElement('i');
+
+				image.src = element.imageUrl; // Lien de l'image
+				image.alt = element.title; // Titre de l'œuvre
+				figure.dataset.category = element.categoryId; // Catégorie
+
+				deleteIcon.classList.add('fa-solid', 'fa-trash-can');
+				deleteButton.appendChild(deleteIcon);
+				figure.appendChild(image);
+				figure.appendChild(deleteButton);
+				gallery.appendChild(figure);
+
+				// Événement pour supprimer l'œuvre au clic du bouton
+				deleteButton.addEventListener('click', function () {
+					const resourceId = element.id;
+					const apiUrl3 = `http://localhost:5678/api/works/${resourceId}`;
+
+					// Suppression de l'œuvre via l'API
+					fetch(apiUrl3, {
+						method: 'DELETE',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${localStorage.getItem('token')}`,
+						},
+					})
+						.then((response) => {
+							if (response.ok) {
+								console.log("Suppression de l'oeuvre avec succès");
+								reloadGallery(); // Recharge la galerie après suppression
 							} else {
 								response.json().then((data) => {
 									console.error('Erreur lors de la suppression:', data);
@@ -276,32 +314,29 @@ function modalGallery() {
 				});
 			});
 
-			// Création et ajout de la ligne de séparation dans la modale
+			// Ajoute une ligne de séparation et un bouton "Ajouter une photo"
 			const separator = document.createElement('hr');
 			const modalGallery = document.querySelector('.modal-wrapper');
 			modalGallery.appendChild(separator);
 
-			// Création et ajout du bouton Ajout photo dans modale
 			const submitButton = document.createElement('input');
 			submitButton.setAttribute('type', 'submit');
 			submitButton.setAttribute('value', 'Ajouter une photo');
 			modalGallery.appendChild(submitButton);
 
-			//Cacher seconde modale
 			gallery.style.display = 'flex';
 			const addPhotoModal = document.querySelector('.modal-add-photo');
-			addPhotoModal.style.display = 'none';
+			addPhotoModal.style.display = 'none'; // Cache la section d'ajout de photo par défaut
 
-			//Quand click sur Ajout photo, cacher et changer contenu modale
+			// Ouvre la section d'ajout de photo au clic du bouton "Ajouter une photo"
 			submitButton.addEventListener('click', function () {
-				gallery.style.display = 'none';
-				addPhotoModal.style.display = 'flex';
+				gallery.style.display = 'none'; //Cache la galerie
+				addPhotoModal.style.display = 'flex'; // Affiche la section d'ajout de photo
 				const modalTitle = document.querySelector('h3');
-				modalTitle.textContent = 'Ajouter une photo';
-				submitButton.setAttribute('value', 'Valider');
-				submitButton.style.background = '#A7A7A7';
+				modalTitle.textContent = 'Ajouter une photo'; // Modifie le titre de la modale
+				submitButton.style.display = 'none'; // Cache le bouton "Ajouter une photo"
 
-				//Ajout icône flèche
+				// Ajoute un bouton retour en haut de la modale
 				const iconeArrow = document.createElement('i');
 				const buttonArrow = document.createElement('button');
 				iconeArrow.classList.add('fas', 'fa-arrow-left');
@@ -310,57 +345,50 @@ function modalGallery() {
 				const enteteIcon = document.querySelector('.close-btn-wrapper');
 				enteteIcon.appendChild(buttonArrow);
 
-				//Ajout du formulaire
-				// Création de l'élément <form>
+				// Création du formulaire d'ajout de photo
 				const form = document.createElement('form');
 				form.setAttribute('action', '#');
 				form.setAttribute('method', 'post');
 
-				// Création du div pour ajouter une photo
 				const divAddPhoto = document.createElement('div');
 				divAddPhoto.classList.add('add-photo');
 
-				// Ajout de l'icône
 				const icon = document.createElement('i');
 				icon.classList.add('fa-regular', 'fa-image');
 
-				// Bouton pour ajouter une photo
 				const button = document.createElement('button');
 				button.classList.add('add-photo-btn');
 
-				// Input pour ajouter le fichier
 				const inputFile = document.createElement('input');
 				inputFile.setAttribute('type', 'file');
 				inputFile.setAttribute('accept', 'image/png, image/jpeg');
 
-				// Paragraphe pour le texte du bouton
 				const buttonText = document.createElement('p');
 				buttonText.textContent = '+ Ajouter photo';
 
-				// Ajout du texte sur le format de fichier accepté
 				const fileInfo = document.createElement('p');
 				fileInfo.textContent = 'jpg, png : 4mo max';
 
-				// Ajout d'un élément image pour l'aperçu
 				const imgPreview = document.createElement('img');
-				imgPreview.style.display = 'none'; // On cache l'image tant qu'aucune n'est sélectionnée
-				imgPreview.style.maxHeight = '169px'; // Limite de la taille de l'aperçu
+				imgPreview.style.display = 'none';
+				imgPreview.style.maxHeight = '169px'; // Limite la taille de l'aperçu de l'image
+				//mettre max taille fichier
 
-				// Gestion de l'affichage de l'image après sélection du fichier
+				// Gestionnaire pour afficher un aperçu de l'image sélectionnée
 				inputFile.addEventListener('change', function (event) {
-					const file = event.target.files[0];
+					const file = event.target.files[0]; // Fichier sélectionné
 
 					if (file) {
 						const reader = new FileReader();
 
 						reader.onload = function (e) {
-							imgPreview.setAttribute('src', e.target.result);
-							imgPreview.style.display = 'block'; // On affiche l'image une fois chargée
+							imgPreview.setAttribute('src', e.target.result); // Affiche l'image
+							imgPreview.style.display = 'block'; // Affiche l'aperçu
 						};
 
-						reader.readAsDataURL(file); // Lecture du fichier en tant qu'URL
+						reader.readAsDataURL(file); // Lit le fichier
 
-						//Masquer tout le contenu de l'encadré bleu
+						//Cache le contenu du rectangle bleu pour laisser place à la photo
 						fileInfo.style.display = 'none';
 						buttonText.style.display = 'none';
 						icon.style.display = 'none';
@@ -368,84 +396,166 @@ function modalGallery() {
 					}
 				});
 
-				// Construction de l'élément bouton
+				// Ajoute les éléments dans le formulaire
 				button.appendChild(inputFile);
 				button.appendChild(buttonText);
-
-				// Ajout des éléments dans le div "add-photo"
 				divAddPhoto.appendChild(icon);
 				divAddPhoto.appendChild(button);
 				divAddPhoto.appendChild(fileInfo);
-				divAddPhoto.appendChild(imgPreview); // Ajouter l'image de prévisualisation après le bouton
+				divAddPhoto.appendChild(imgPreview);
 
-				// Création du label et input pour le titre
+				// Création de l'élément label pour le titre de la photo
 				const labelTitle = document.createElement('label');
-				labelTitle.setAttribute('for', 'title-photo');
+				labelTitle.setAttribute('for', 'title-photo'); // Attribut 'for' lié à l'ID de l'input pour l'accessibilité
 				labelTitle.textContent = 'Titre';
 
+				// Création de l'élément input pour le titre de la photo
 				const inputTitle = document.createElement('input');
 				inputTitle.setAttribute('type', 'text');
 				inputTitle.setAttribute('name', 'title');
-				inputTitle.setAttribute('id', 'title-photo');
+				inputTitle.setAttribute('id', 'title-photo'); // ID pour associer avec le label
 
-				// Création du label et du select pour la catégorie
+				// Création de l'élément label pour la catégorie de la photo
 				const labelCategory = document.createElement('label');
-				labelCategory.setAttribute('for', 'photo-category');
+				labelCategory.setAttribute('for', 'photo-category'); // Attribut 'for' lié à l'ID de l'élément select
 				labelCategory.textContent = 'Catégorie';
 
+				// Création de l'élément select pour choisir la catégorie de la photo
 				const selectCategory = document.createElement('select');
 				selectCategory.setAttribute('name', 'category');
-				selectCategory.setAttribute('id', 'photo-category');
+				selectCategory.setAttribute('id', 'photo-category'); //ID pour associer avec le label
 
-				// Ajout des éléments dans le formulaire
+				// Création du bouton de validation
+				const addButton = document.createElement('input');
+				addButton.setAttribute('type', 'submit');
+				addButton.setAttribute('value', 'Valider');
+				addButton.style.background = '#A7A7A7'; // Couleur grisée (indiquant qu'il est désactivé au départ)
+
+				// Ajout des éléments au formulaire
 				form.appendChild(divAddPhoto);
 				form.appendChild(labelTitle);
 				form.appendChild(inputTitle);
 				form.appendChild(labelCategory);
 				form.appendChild(selectCategory);
+				form.appendChild(separator);
+				form.appendChild(addButton);
 
-				// Ajout du formulaire dans .modal-add-photo
+				// Ajout du formulaire à la modale
 				addPhotoModal.appendChild(form);
 
-				// Quand click sur la catégorie
+				// Sélection de l'élément select pour la catégorie
 				const categoryChoice = document.getElementById('photo-category');
-				const emptyOption = document.createElement('option');
-				emptyOption.textContent = '0';
-				emptyOption.style.opacity = '0';
-				categoryChoice.appendChild(emptyOption);
-				categoryChoice.innerHTML = ''; // Vider toutes les options avant de charger les nouvelles
+				categoryChoice.innerHTML = ''; // Vide le contenu de l'élément pour éviter les doublons
 
+				// Fetch pour obtenir les catégories à afficher dans le menu déroulant
 				fetch(apiUrl2)
 					.then((response) => {
-						// Vérifie si la réponse de l'API est correcte
 						if (!response.ok) {
 							throw new Error(
 								'Erreur dans la requête API : ' + response.statusText
 							);
 						}
-						return response.json(); // Conversion de la réponse en format JSON
+						return response.json();
 					})
 					.then((categories) => {
-						// Filtrer les catégories pour supprimer les doublons par ID
+						// Filtrer les catégories pour éviter les doublons
 						const uniqueCategories = categories.filter(
 							(category, index, self) =>
 								index === self.findIndex((cat) => cat.id === category.id)
 						);
-						// Pour chaque catégorie reçue, créer une option
+
+						// Boucle pour créer une option dans le select pour chaque catégorie unique
 						uniqueCategories.forEach((category) => {
-							const optionCategory = document.createElement('option'); // Création d'une option pour chaque catégorie
-							optionCategory.textContent = category.name; // Utilise le nom de la catégorie comme texte
-							optionCategory.value = category.id; // Association de l'ID de la catégorie à l'option
-							categoryChoice.appendChild(optionCategory);
+							const optionCategory = document.createElement('option');
+							optionCategory.textContent = category.name; // Affichage du nom de la catégorie
+							optionCategory.value = category.id; // Valeur envoyée avec le formulaire
+							categoryChoice.appendChild(optionCategory); // Ajout de l'option au select
 						});
 					})
 					.catch((error) => {
-						console.error('Erreur :', error); // Affiche une erreur dans la console en cas de problème
+						console.error('Erreur :', error);
 					});
+
+				// Fonction pour vérifier si le formulaire est correctement rempli
+				function checkForm() {
+					// Si tous les champs sont remplis, on active le bouton de validation
+					if (
+						inputTitle.value &&
+						selectCategory.value &&
+						inputFile.files.length > 0
+					) {
+						addButton.disabled = false;
+						addButton.style.backgroundColor = '#1d6154'; // Changer la couleur du bouton en vert (activé)
+					} else {
+						addButton.disabled = true; // Désactivation du bouton si des champs manquent
+						addButton.style.backgroundColor = '#A7A7A7'; // Garder le bouton en gris
+					}
+				}
+
+				// Ajouter des écouteurs d'événements pour vérifier en temps réel si le formulaire est rempli
+				inputTitle.addEventListener('input', checkForm);
+				selectCategory.addEventListener('input', checkForm);
+				inputFile.addEventListener('change', checkForm);
+
+				// Add event listener sur la soumission du formulaire
+				form.addEventListener('submit', function (event) {
+					event.preventDefault(); // Empêche la soumission par défaut
+					// Vérification finale des champs
+					if (
+						inputTitle.value &&
+						selectCategory.value &&
+						inputFile.files.length > 0
+					) {
+						alert('Formulaire soumis avec succès !');
+					} else {
+						alert('Veuillez compléter tous les champs avant de soumettre.');
+					}
+				});
+
+				// Écouter le clic sur le bouton de soumission
+				addButton.addEventListener('click', function (event) {
+					event.preventDefault(); // Empêche le comportement par défaut
+					// Récupération des valeurs du formulaire
+					const titleInput = document.querySelector('#title-photo').value;
+					const categorySelect =
+						document.querySelector('#photo-category').value;
+
+					// Vérification des champs avant envoi
+					if (!inputFile || !titleInput || !categorySelect) {
+						console.error('Veuillez remplir tous les champs.');
+						return;
+					}
+
+					// Création d'un objet FormData pour envoyer les données du formulaire avec le fichier
+					const formData = new FormData();
+					formData.append('title', titleInput); //Ajout du titre
+					formData.append('image', inputFile.files[0]); //Ajout de l'image sélectionnée
+					formData.append('category', selectCategory.value); //Ajout de la catégorie
+
+					// Envoi des données via l'API
+					fetch(apiUrl, {
+						method: 'POST',
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem('token')}`,
+						},
+						body: formData,
+					})
+						.then((response) => {
+							if (!response.ok) {
+								throw new Error(
+									"Erreur lors de l'ajout de l'œuvre : " + response.statusText
+								);
+							}
+							return response.json();
+						})
+						.then((data) => {
+							console.log('Œuvre ajoutée avec succès :', data);
+							reloadGallery(); // Recharge la galerie pour afficher l'œuvre ajoutée
+							form.reset(); // Réinitialise le formulaire après soumission
+						})
+						.catch((error) => console.error('Erreur :', error));
+				});
 			});
-		})
-		.catch((error) => {
-			console.error('Erreur :', error); // Affiche une erreur dans la console en cas de problème
 		});
 }
 

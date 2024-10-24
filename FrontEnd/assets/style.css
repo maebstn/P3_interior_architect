@@ -485,6 +485,7 @@ hr {
 	height: 51px;
 	border: 0px;
 	margin-bottom: 47px;
+	font-size: 14px;
 }
 
 .modal-add-photo label {
@@ -543,6 +544,9 @@ hr {
 
 #photo-category option {
 	color: #444444;
+	font-family: 'Work Sans';
+	font-weight: 400;
+	font-size: 14px;
 }
 
 #title-photo {
@@ -550,4 +554,13 @@ hr {
 	font-size: 14px;
 	color: #444444;
 	font-weight: 400;
+	font-family: 'Work Sans';
+}
+
+input[value='Valider'] {
+	border-radius: 60px;
+	height: 36px;
+	width: 237px;
+	margin-top: 32px;
+	color: white;
 }
