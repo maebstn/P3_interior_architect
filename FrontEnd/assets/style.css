@@ -329,7 +329,8 @@ footer nav ul {
 	align-items: center;
 }
 
-.modal-wrapper {
+.modal-wrapper,
+.second-modal-wrapper {
 	width: 630px;
 	height: 688px;
 	background: white;
@@ -453,15 +454,21 @@ hr {
 
 /*Seconde modale*/
 
-.modal-add-photo {
-	justify-content: center;
-	font-size: 16px;
+.icone-area {
+	display: flex;
+	justify-content: space-between;
 }
 
 .modal-add-photo form {
 	display: flex;
 	flex-direction: column;
 	width: 420px;
+	margin: auto;
+}
+
+.modal-add-photo {
+	justify-content: center;
+	font-size: 16px;
 }
 
 .modal-add-photo input {
@@ -475,6 +482,7 @@ hr {
 	color: #444444;
 	font-size: 16px;
 	font-weight: 400;
+	border: none;
 }
 
 .modal-add-photo select {
@@ -563,4 +571,11 @@ input[value='Valider'] {
 	width: 237px;
 	margin-top: 32px;
 	color: white;
+}
+
+/*Erreur*/
+
+.error-message {
+	color: red;
+	text-align: center;
 }

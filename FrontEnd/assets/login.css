@@ -123,17 +123,23 @@ table {
 	border-spacing: 0;
 }
 /** end reset css**/
+
 body {
-	max-width: 1140px;
+	max-width: 1440px;
+	max-height: 1024px;
+	height: 100vh;
 	margin: auto;
 	font-family: 'Work Sans';
 	font-size: 14px;
 	background-color: rgb(255, 254, 248);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 }
 header {
 	display: flex;
 	justify-content: space-between;
-	margin: 50px 0;
+	margin: 50px 150px;
 }
 
 main {
@@ -186,7 +192,7 @@ nav img {
 }
 
 #login {
-	width: 50%;
+	width: 379px;
 	margin: auto;
 }
 #login > * {
@@ -212,12 +218,20 @@ nav img {
 	margin: 2em 0 1em 0;
 }
 
+#login a {
+	color: #3d3d3d;
+	font-family: 'Work Sans';
+	font-size: 14px;
+	font-weight: 500;
+	text-align: center;
+}
+
 input[type='submit'] {
 	font-family: 'Syne';
 	font-weight: 700;
 	color: white;
 	background-color: #1d6154;
-	margin: 2em auto;
+	margin: 36px auto 27px auto;
 	width: 180px;
 	text-align: center;
 	border-radius: 60px;
@@ -226,5 +240,13 @@ input[type='submit'] {
 footer nav ul {
 	display: flex;
 	justify-content: flex-end;
-	margin: 2em;
+	background-color: white;
+	height: 60px;
+}
+
+footer li {
+	font-family: 'Work Sans';
+	font-size: 14px;
+	font-weight: 300;
+	padding-right: 107px;
 }
