@@ -67,8 +67,8 @@ fetch(apiUrl2)
 			});
 			document
 				.querySelectorAll('.filters button')
-				.forEach((btn) => btn.classList.remove('active')); // Retire la classe 'active' de tous les boutons de filtre
-			buttonTous.classList.add('active'); // Ajoute la classe 'active' au bouton "Tous"
+				.forEach((btn) => btn.classList.remove('active')); // Retire la class 'active' de tous les boutons filtres
+			buttonTous.classList.add('active'); // Ajoute la class 'active' au bouton "Tous"
 		});
 
 		// Pour chaque catégorie reçue, créer un bouton
@@ -108,11 +108,18 @@ identificationLogin.addEventListener('click', function () {
 	window.location.href = 'login.html';
 });
 
+//Redirection vers page principale en appuyant sur le logo
+let mainPage = document.querySelector('h1');
+mainPage.addEventListener('click', function () {
+	window.location.href = 'index.html';
+});
+
 // Fonction page administrateur
-async function loginUserPage() {
+function loginUserPage() {
+	//Vérification si token dans local storage
 	const token = localStorage.getItem('token');
 	if (token) {
-		console.log(token);
+		// Masquer les filtres
 		const container = document.querySelector('.filters');
 		container.classList.add('hide');
 
@@ -158,47 +165,8 @@ async function loginUserPage() {
 // Appelle la fonction immédiatement
 loginUserPage();
 
-//Modales
-// Sélection des éléments modale, bouton de fermeture et bouton d'ouverture
-const modal = document.querySelector('.modal-overlay');
-const closeBtn = document.querySelector('.close-modal-btn');
-const buttonModif = document.querySelector('.open-modal-btn');
-const modalContentGallery = document.querySelector('.modal-content');
-const addPhotoModal = document.querySelector('.modal-add-photo');
-const modalGallery2 = document.querySelector('.modal-wrapper');
-
-// Fonction pour ouvrir la modale (retire la classe 'hide' pour la rendre visible)
-async function openModal() {
-	modal.classList.remove('hide');
-}
-
-// Fonction pour fermer la modale si clic en dehors modale
-async function closeModal(e, clickedOutside) {
-	if (clickedOutside) {
-		// Si le clic est en dehors de la modale (sur l'overlay), on la cache
-		if (e.target.classList.contains('modal-overlay')) {
-			modal.classList.add('hide');
-			reloadModalGallery();
-			reloadMainGallery();
-		}
-	} else {
-		modal.classList.add('hide');
-		reloadModalGallery();
-		reloadMainGallery();
-	}
-}
-
-// Ouvre la modale au clic sur le bouton d'ouverture
-buttonModif.addEventListener('click', openModal);
-
-// Ferme la modale si l'utilisateur clique à l'extérieur
-modal.addEventListener('click', (e) => closeModal(e, true));
-
-// Ferme la modale en cliquant sur le bouton de fermeture
-closeBtn.addEventListener('click', closeModal);
-
 // Fonction pour initialiser et afficher la galerie dans la modale
-function modalGallery() {
+function modalFunction() {
 	// Fetch pour récupérer les œuvres à afficher
 	fetch(apiUrl)
 		.then((response) => {
@@ -208,10 +176,48 @@ function modalGallery() {
 			return response.json();
 		})
 		.then((data) => {
-			//MODALE 1
-			// Sélectionne la galerie
+			//Modales
+			// Sélection des éléments modale, bouton de fermeture et bouton d'ouverture
+			const modal = document.querySelector('.modal-overlay');
+			const closeBtn = document.querySelector('.close-modal-btn');
+			const buttonModif = document.querySelector('.open-modal-btn');
 			const modalContentGallery = document.querySelector('.modal-content');
+			const modalGalleryPhoto = document.querySelector('.modal-wrapper');
+
+			// Fonction pour ouvrir la modale (retire la classe 'hide' pour la rendre visible)
+			function openModal() {
+				modal.classList.remove('hide');
+				modalGalleryPhoto.style.display = 'flex'; //Affiche la première modale
+				modalAddPhoto.style.display = 'none';
+			}
+
+			// Fonction pour fermer la modale si clic en dehors modale
+			function closeModal(e, clickedOutside) {
+				if (clickedOutside) {
+					// Si le clic est en dehors de la modale (sur l'overlay), on la cache
+					if (e.target.classList.contains('modal-overlay')) {
+						modal.classList.add('hide');
+						reloadModalGallery();
+						reloadMainGallery();
+					}
+				} else {
+					modal.classList.add('hide');
+					reloadModalGallery();
+					reloadMainGallery();
+				}
+			}
+
+			//Add Event Listener sur l'ouverture et fermeture modale
+			// Ouvre la modale quand click bouton
+			buttonModif.addEventListener('click', openModal);
+			// Ferme la modale si l'utilisateur clique à l'extérieur
+			modal.addEventListener('click', (e) => closeModal(e, true));
+			// Ferme la modale quand click bouton
+			closeBtn.addEventListener('click', closeModal);
+
+			//MODALE 1
 			data.forEach((element) => {
+				// Parcourt chaque élément du tableau "data"
 				// Création de la structure pour chaque œuvre (figure, image, bouton de suppression)
 				const figure = document.createElement('figure');
 				const image = document.createElement('img');
@@ -219,8 +225,8 @@ function modalGallery() {
 				const deleteIcon = document.createElement('i');
 
 				image.src = element.imageUrl; // Lien de l'image
-				image.alt = element.title; // Titre de l'œuvre
-				figure.dataset.category = element.categoryId; // Catégorie
+				image.alt = element.title; // Texte alternatif
+				figure.dataset.category = element.categoryId; // AJout catégorie pour chaque oeuvre
 
 				deleteIcon.classList.add('fa-solid', 'fa-trash-can');
 				deleteButton.appendChild(deleteIcon);
@@ -249,6 +255,11 @@ function modalGallery() {
 							} else {
 								response.json().then((data) => {
 									console.error('Erreur lors de la suppression:', data);
+									const errorDelete = document.createElement('p');
+									errorDelete.innerHTML =
+										'Erreur survenue lors de la suppression.';
+									errorDelete.classList.add('error-message');
+									modalGalleryPhoto.appendChild(errorDelete);
 								});
 							}
 						})
@@ -258,30 +269,30 @@ function modalGallery() {
 
 			// Ajoute une ligne de séparation et un bouton "Ajouter une photo"
 			const separator = document.createElement('hr');
-			modalGallery2.appendChild(separator);
+			modalGalleryPhoto.appendChild(separator);
 
 			const addPhotoButton = document.createElement('input');
 			addPhotoButton.setAttribute('type', 'submit');
 			addPhotoButton.setAttribute('value', 'Ajouter une photo');
-			modalGallery2.appendChild(addPhotoButton);
-			modalGallery2.style.display = 'flex';
+			modalGalleryPhoto.appendChild(addPhotoButton);
+			modalGalleryPhoto.style.display = 'flex';
 
 			// Ouvre la section d'ajout de photo au clic du bouton "Ajouter une photo"
 			addPhotoButton.addEventListener('click', function () {
-				modalGallery2.style.display = 'none'; //Cache la première modale
-				secondModal.style.display = 'flex'; // Affiche la section d'ajout de photo
+				modalGalleryPhoto.style.display = 'none'; //Cache la première modale
+				modalAddPhoto.style.display = 'flex'; // Affiche la section d'ajout de photo
 			});
 
 			//MODALE 2
-			const secondModal = document.createElement('div');
-			secondModal.classList.add('second-modal-wrapper');
-			secondModal.style.display = 'none';
-			modal.appendChild(secondModal);
+			const modalAddPhoto = document.createElement('div');
+			modalAddPhoto.classList.add('second-modal-wrapper');
+			modalAddPhoto.style.display = 'none';
+			modal.appendChild(modalAddPhoto);
 
 			//Zone icônes flèche et croix
 			const iconeArea = document.createElement('div');
 			iconeArea.classList.add('icone-area');
-			secondModal.appendChild(iconeArea);
+			modalAddPhoto.appendChild(iconeArea);
 
 			// Bouton flèche en haut modale
 			const iconeArrow = document.createElement('i');
@@ -291,8 +302,8 @@ function modalGallery() {
 			buttonArrow.classList.add('arrow-btn-wrapper');
 			iconeArea.appendChild(buttonArrow);
 			buttonArrow.addEventListener('click', function () {
-				modalGallery2.style.display = 'flex'; //Affiche la première modale
-				secondModal.style.display = 'none'; // Cache la section d'ajout de photo
+				modalGalleryPhoto.style.display = 'flex'; //Affiche la première modale
+				modalAddPhoto.style.display = 'none'; // Cache la section d'ajout de photo
 				form.reset(); //Vide le formulaire
 				(inputFile.value = ''), //Vide le file
 					(imgPreview.src = ''), //Supprimer l'image
@@ -300,6 +311,9 @@ function modalGallery() {
 				buttonText.style.display = 'inline';
 				icon.style.display = 'inline';
 				button.style.display = 'inline';
+				button.style.border = 'none';
+				const allErrorMessage = document.querySelector('.error-message');
+				allErrorMessage.textContent = '';
 				reloadModalGallery(); // Recharge la galerie pour afficher l'œuvre ajoutée
 				reloadMainGallery();
 			});
@@ -316,12 +330,12 @@ function modalGallery() {
 			//Titre modale2
 			const secondTitle = document.createElement('h3');
 			secondTitle.textContent = 'Ajouter une photo';
-			secondModal.appendChild(secondTitle);
+			modalAddPhoto.appendChild(secondTitle);
 
 			//Contenant modale 2
 			const addPhotoModal = document.createElement('div');
-			addPhotoModal.classList.add('modal-add-photo');
-			secondModal.appendChild(addPhotoModal);
+			addPhotoModal.classList.add('second-modal-content');
+			modalAddPhoto.appendChild(addPhotoModal);
 
 			// Création du formulaire d'ajout de photos
 			const form = document.createElement('form');
@@ -358,7 +372,7 @@ function modalGallery() {
 
 				// Supprimer les messages d'erreur précédents
 				const existingErrorMessages =
-					secondModal.querySelectorAll('.error-message');
+					modalAddPhoto.querySelectorAll('.error-message');
 				existingErrorMessages.forEach((message) => message.remove());
 
 				// Vérification de la taille du fichier
@@ -368,13 +382,12 @@ function modalGallery() {
 						'La taille image est trop volumineuse.<br>Veuillez sélectionner un fichier de moins de 4 Mo.';
 					errorSizeMessage.classList.add('error-message');
 					button.style.border = '1px solid red';
-					secondModal.appendChild(errorSizeMessage);
+					modalAddPhoto.appendChild(errorSizeMessage);
 					inputFile.value = ''; // Réinitialise le champ de fichier
 					imgPreview.src = ''; // Réinitialise l'aperçu
 					return; // Arrête le code ici si la taille dépasse la limite
 				}
 
-				// Vérification du format du fichier
 				const allowedFormats = ['image/jpg', 'image/png']; // Formats acceptés
 				if (!allowedFormats.includes(file.type)) {
 					const errorFormatMessage = document.createElement('p');
@@ -382,17 +395,19 @@ function modalGallery() {
 						'Format de fichier non accepté.<br>Veuillez sélectionner une image au format JPG ou PNG';
 					errorFormatMessage.classList.add('error-message');
 					button.style.border = '1px solid red';
-					secondModal.appendChild(errorFormatMessage);
+					modalAddPhoto.appendChild(errorFormatMessage);
 					inputFile.value = ''; // Réinitialise le champ de fichier
 					imgPreview.src = ''; // Réinitialise l'aperçu
 					return; // Arrête le code ici si le format n'est pas accepté
 				}
 
 				if (file) {
-					const reader = new FileReader();
+					//Si on a un fichier téléchargé
+					const reader = new FileReader(); //On lit le contenu du fichier
 
 					reader.onload = function (e) {
-						imgPreview.setAttribute('src', e.target.result); // Affiche l'image
+						//Quand le fichier est chargé
+						imgPreview.setAttribute('src', e.target.result); // La source de l'image est mise à jour
 						imgPreview.style.display = 'block'; // Affiche l'aperçu
 					};
 
@@ -483,14 +498,14 @@ function modalGallery() {
 				});
 
 			// Fonction pour vérifier si le formulaire est correctement rempli
-			async function checkForm() {
-				// Si tous les champs sont remplis, on active le bouton de validation
+			function checkForm() {
+				// Vérifie que tous les champs sont remplis
 				if (
 					inputTitle.value &&
 					selectCategory.value &&
 					inputFile.files.length > 0
 				) {
-					submitButton.disabled = false;
+					submitButton.disabled = false; // Active le bouton
 					submitButton.style.backgroundColor = '#1d6154'; // Changer la couleur du bouton en vert (activé)
 				} else {
 					submitButton.disabled = true; // Désactivation du bouton si des champs manquent
@@ -503,7 +518,7 @@ function modalGallery() {
 			selectCategory.addEventListener('input', checkForm);
 			inputFile.addEventListener('change', checkForm);
 
-			// Add event listener sur la soumission du formulaire
+			// Add event listener sur la soumission globale du formulaire
 			form.addEventListener('submit', function (event) {
 				event.preventDefault(); // Empêche la soumission par défaut
 				// Vérification finale des champs
@@ -512,7 +527,7 @@ function modalGallery() {
 
 			// Écouter le clic sur le bouton valider submitButton
 			submitButton.addEventListener('click', function (event) {
-				event.preventDefault(); // Empêche le comportement par défaut
+				event.preventDefault(); // Empêche le rechargement par défaut
 				// Récupération des valeurs du formulaire
 				const inputTitle = document.querySelector('#title-photo').value;
 
@@ -531,6 +546,11 @@ function modalGallery() {
 				})
 					.then((response) => {
 						if (!response.ok) {
+							const errorForm = document.createElement('p');
+							errorForm.innerHTML =
+								"Erreur lors de l'ajout de l'oeuvre. Veuillez vous identifier.";
+							errorForm.classList.add('error-message');
+							addPhotoModal.appendChild(errorForm);
 							throw new Error(
 								"Erreur lors de l'ajout de l'œuvre : " + response.statusText
 							);
@@ -546,8 +566,8 @@ function modalGallery() {
 						buttonText.style.display = 'inline';
 						icon.style.display = 'inline';
 						button.style.display = 'inline';
-						modalGallery2.style.display = 'flex'; //Affiche la première modale
-						secondModal.style.display = 'none'; // Cache la section d'ajout de photo;
+						modalGalleryPhoto.style.display = 'flex'; //Affiche la première modale
+						modalAddPhoto.style.display = 'none'; // Cache la section d'ajout de photo;
 						reloadMainGallery();
 						reloadModalGallery();
 					})
@@ -556,7 +576,7 @@ function modalGallery() {
 		});
 }
 
-modalGallery();
+modalFunction();
 
 // Fonction pour recharger la galerie d'œuvres de la modale
 async function reloadModalGallery(e) {

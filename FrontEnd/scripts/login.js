@@ -11,43 +11,51 @@ let errorCheck = false;
 bouton.addEventListener('click', submitClick);
 
 function submitClick(event) {
-	event.preventDefault();
-
+	event.preventDefault(); // Empêche le rechargement de la page lors de la soumission du formulaire
 	fetch(apiUrl3, {
+		// Envoi des données à l'API via une requête POST
 		method: 'POST',
 		headers: {
-			Accept: 'application/json',
-			'Content-type': 'application/json',
+			Accept: 'application/json', // Indique que la réponse attendue est au format JSON
+			'Content-type': 'application/json', // Indique que les données envoyées sont au format JSON
 		},
 		body: JSON.stringify({
-			email: email.value,
-			password: mdp.value,
+			// Transforme les données en chaîne JSON
+			email: email.value, // Valeur de l'input email
+			password: mdp.value, // Valeur de l'input mot de passe
 		}),
 	})
 		.then((r) => {
+			// Vérifie si la requête a réussi
 			if (r.ok) {
-				return r.json();
+				return r.json(); // Si oui, retourne la réponse au format JSON
 			} else {
-				throw new Error('Erreur serveur', { cause: r });
+				throw new Error('Erreur serveur', { cause: r }); // Si non, lance une erreur avec les détails de la réponse
 			}
 		})
 		.then((reponse) => {
-			localStorage.setItem('token', reponse.token);
+			// Traitement de la réponse en cas de succès
+			localStorage.setItem('token', reponse.token); // Stocke le token dans le localStorage
+			// Crée un message de succès
 			const trueMessage = document.createElement('p');
-			const divForm = document.querySelector('#login');
-			divForm.appendChild(trueMessage);
+			const divForm = document.querySelector('#login'); // Sélectionne la div contenant le formulaire
+			divForm.appendChild(trueMessage); // Ajoute le message de succès à la div
 
 			trueMessage.style.color = 'green';
-			count();
+			count(); // Appelle la fonction du compte à rebours
 		})
 
 		.catch((e) => {
+			// Gestion des erreurs
 			if (!errorCheck) {
-				errorCheck = true;
+				// Vérifie si un message d'erreur est déjà affiché
+				errorCheck = true; // Bloque l'affichage d'autres messages d'erreur
+
+				// Crée un message d'erreur
 				const errorMessage = document.createElement('p');
 				const divForm = document.querySelector('#login');
 				divForm.appendChild(errorMessage);
-				errorMessage.setAttribute('data-error', 'true');
+				errorMessage.setAttribute('data-error', 'true'); // Ajoute un attribut pour identifier l'erreur
 
 				errorMessage.innerText =
 					"L'identifiant et/ou le mot de passe est incorrect.";
@@ -56,9 +64,11 @@ function submitClick(event) {
 				email.style.border = '1px solid red';
 				mdp.style.border = '1px solid red';
 
+				// Ajoute des événements pour supprimer le message d'erreur en cliquant sur les champs
 				email.addEventListener('click', removeErrorMessage);
 				mdp.addEventListener('click', removeErrorMessage);
 			} else {
+				// Si un message d'erreur est déjà présent, ne fait rien
 				return;
 			}
 		});
@@ -103,3 +113,9 @@ function count() {
 		}
 	}, 1000);
 }
+
+//Redirection vers page principale en appuyant sur le logo
+let mainPage = document.querySelector('h1');
+mainPage.addEventListener('click', function () {
+	window.location.href = 'index.html';
+});
