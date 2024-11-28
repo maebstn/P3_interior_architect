@@ -227,6 +227,10 @@ nav img {
 	text-align: center;
 }
 
+#coundown {
+	margin-top: 10px;
+}
+
 input[type='submit'] {
 	font-family: 'Syne';
 	font-weight: 700;
